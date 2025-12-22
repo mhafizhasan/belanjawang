@@ -77,6 +77,7 @@ begin
     coalesce(
       new.raw_user_meta_data->>'full_name', 
       new.raw_user_meta_data->>'name', 
+      new.raw_user_meta_data->>'display_name',
       split_part(new.email, '@', 1), 
       'Member'
     ), 

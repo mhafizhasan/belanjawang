@@ -26,6 +26,7 @@ export default function AuthScreen() {
                         data: {
                             full_name: name.trim(),
                             name: name.trim(),
+                            display_name: name.trim(),
                         }
                     }
                 });
