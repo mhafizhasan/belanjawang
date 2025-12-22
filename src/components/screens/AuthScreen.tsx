@@ -19,29 +19,16 @@ export default function AuthScreen() {
             if (mode === 'signup') {
                 if (!name.trim()) throw new Error('Please enter your name');
 
-                const { data, error } = await supabase.auth.signUp({
+                const { error } = await supabase.auth.signUp({
                     email,
                     password,
+                    options: {
+                        data: {
+                            full_name: name.trim(),
+                        }
+                    }
                 });
                 if (error) throw error;
-
-                if (data.user) {
-                    // Auto-create Admin Member
-                    // @ts-ignore
-                    const { error: memberError } = await (supabase
-                        .from('members') as any)
-                        .insert([{
-                            user_id: data.user.id,
-                            name: name.trim(),
-                            email: email,
-                            role: 'Admin'
-                        }]);
-
-                    if (memberError) {
-                        console.error('Error creating admin member:', memberError);
-                        // Optional: Delete user if member creation fails
-                    }
-                }
 
                 alert('Sign up successful! Please check your email to verify your account.');
             } else {
