@@ -1,14 +1,14 @@
 
-import { Settings } from 'lucide-react';
 import type { Member, Expense } from '../../lib/types';
 
 interface MembersScreenProps {
     members: Member[];
     expenses: Expense[];
     onAddMember: () => void;
+    onDeleteMember?: (id: number) => void;
 }
 
-export default function MembersScreen({ members, expenses, onAddMember }: MembersScreenProps) {
+export default function MembersScreen({ members, expenses, onAddMember, onDeleteMember }: MembersScreenProps) {
     const memberTotals = expenses.reduce((acc, exp) => {
         acc[exp.member_name] = (acc[exp.member_name] || 0) + exp.amount;
         return acc;
@@ -35,9 +35,15 @@ export default function MembersScreen({ members, expenses, onAddMember }: Member
                                     <p className="text-sm text-gray-500">${(memberTotals[member.name] || 0).toFixed(2)} spent</p>
                                 </div>
                             </div>
-                            <button className="text-gray-400 hover:text-gray-600">
-                                <Settings className="w-5 h-5" />
-                            </button>
+                            {member.role !== 'Admin' && (
+                                <button
+                                    onClick={() => onDeleteMember?.(member.id)}
+                                    className="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                    title="Remove Member"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                                </button>
+                            )}
                         </div>
                     </div>
                 ))}

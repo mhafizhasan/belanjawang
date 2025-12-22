@@ -161,6 +161,51 @@ export default function App() {
     }
   };
 
+  const handleDeleteMember = async (memberId: number) => {
+    try {
+      const adminMember = members.find(m => m.role === 'Admin');
+      const targetMember = members.find(m => m.id === memberId);
+
+      if (!adminMember) throw new Error('No Admin found to reassign expenses to.');
+      if (!targetMember) throw new Error('Member not found.');
+      if (targetMember.role === 'Admin') {
+        alert('Cannot remove the main Admin account.');
+        return;
+      }
+
+      const confirmDelete = window.confirm(
+        `Are you sure you want to remove ${targetMember.name}? All their expenses will be moved to ${adminMember.name}.`
+      );
+      if (!confirmDelete) return;
+
+      // 1. Reassign expenses to Admin
+      // @ts-ignore
+      const { error: updateError } = await (supabase
+        .from('expenses') as any)
+        .update({
+          member_id: adminMember.id,
+          member_name: adminMember.name, // Important to update denormalized name
+        })
+        .eq('member_id', memberId);
+
+      if (updateError) throw updateError;
+
+      // 2. Delete the member
+      const { error: deleteError } = await supabase
+        .from('members')
+        .delete()
+        .eq('id', memberId);
+
+      if (deleteError) throw deleteError;
+
+      // 3. Update UI
+      fetchData(selectedDate);
+    } catch (error: any) {
+      console.error('Error deleting member:', error);
+      alert(`Error reducing family: ${error.message}`);
+    }
+  };
+
   const handleMonthChange = (direction: 'prev' | 'next') => {
     const newDate = new Date(selectedDate);
     if (direction === 'prev') {
@@ -214,7 +259,14 @@ export default function App() {
           onMonthChange={handleMonthChange}
         />
       )}
-      {currentScreen === 'members' && <MembersScreen members={members} expenses={expenses} onAddMember={() => setShowAddMember(true)} />}
+      {currentScreen === 'members' && (
+        <MembersScreen
+          members={members}
+          expenses={expenses}
+          onAddMember={() => setShowAddMember(true)}
+          onDeleteMember={handleDeleteMember}
+        />
+      )}
 
       {/* Modals */}
       {showExpenseModal && (
