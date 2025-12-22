@@ -72,12 +72,23 @@ create or replace function public.handle_new_user()
 returns trigger as $$
 begin
   insert into public.members (user_id, name, email, role)
-  values (new.id, new.raw_user_meta_data->>'full_name', new.email, 'Admin');
+  values (
+    new.id, 
+    coalesce(
+      new.raw_user_meta_data->>'full_name', 
+      new.raw_user_meta_data->>'name', 
+      split_part(new.email, '@', 1), 
+      'Member'
+    ), 
+    new.email, 
+    'Admin'
+  );
   return new;
 end;
 $$ language plpgsql security definer;
 
 -- Trigger to call the function on new user creation
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
