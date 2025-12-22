@@ -30,7 +30,7 @@ export default function ExpenseModal({ members, selectedDate, expense, onClose, 
         }
     }, [expense]);
 
-    const categories = ['Meal', 'Groceries', 'Eco Shop', 'Utilities', 'Transport', 'Entertainment', 'Healthcare', 'Education'];
+    const categories = ['Meal', 'Groceries', 'Eco Shop', 'Transport', 'Entertainment', 'Education'];
 
     const handleSubmit = () => {
         if (formData.member_id && formData.category && formData.amount) {
