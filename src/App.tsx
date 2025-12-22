@@ -55,7 +55,8 @@ export default function App() {
         .select('*')
         .gte('date', startOfMonth)
         .lte('date', endOfMonth)
-        .order('date', { ascending: false });
+        .order('date', { ascending: false })
+        .order('created_at', { ascending: false });
 
       if (membersError) throw membersError;
       if (expensesError) throw expensesError;
