@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Mail, Lock, Loader2 } from 'lucide-react';
+import { Mail, Lock, Loader2, User } from 'lucide-react';
 
 export default function AuthScreen() {
     const [loading, setLoading] = useState(false);
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [mode, setMode] = useState<'login' | 'signup'>('login');
@@ -16,11 +17,32 @@ export default function AuthScreen() {
 
         try {
             if (mode === 'signup') {
-                const { error } = await supabase.auth.signUp({
+                if (!name.trim()) throw new Error('Please enter your name');
+
+                const { data, error } = await supabase.auth.signUp({
                     email,
                     password,
                 });
                 if (error) throw error;
+
+                if (data.user) {
+                    // Auto-create Admin Member
+                    // @ts-ignore
+                    const { error: memberError } = await (supabase
+                        .from('members') as any)
+                        .insert([{
+                            user_id: data.user.id,
+                            name: name.trim(),
+                            email: email,
+                            role: 'Admin'
+                        }]);
+
+                    if (memberError) {
+                        console.error('Error creating admin member:', memberError);
+                        // Optional: Delete user if member creation fails
+                    }
+                }
+
                 alert('Sign up successful! Please check your email to verify your account.');
             } else {
                 const { error } = await supabase.auth.signInWithPassword({
@@ -45,6 +67,23 @@ export default function AuthScreen() {
                 </div>
 
                 <form onSubmit={handleAuth} className="space-y-4">
+                    {mode === 'signup' && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">Full Name</label>
+                            <div className="relative">
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    placeholder="John Doe"
+                                    required={mode === 'signup'}
+                                />
+                            </div>
+                        </div>
+                    )}
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">Email</label>
                         <div className="relative">
