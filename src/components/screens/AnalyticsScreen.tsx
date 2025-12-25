@@ -49,23 +49,25 @@ export default function AnalyticsScreen({ expenses, selectedDate, onMonthChange 
                 <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                     <h3 className="font-bold text-gray-800 mb-3">By Category</h3>
                     <div className="space-y-3">
-                        {Object.entries(categoryTotals).map(([category, amount]) => {
-                            const percentage = totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0;
-                            return (
-                                <div key={category}>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-gray-700">{category}</span>
-                                        <span className="font-semibold text-gray-900">${amount.toFixed(2)}</span>
+                        {Object.entries(categoryTotals)
+                            .sort(([, a], [, b]) => b - a)
+                            .map(([category, amount]) => {
+                                const percentage = totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0;
+                                return (
+                                    <div key={category}>
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <span className="text-gray-700">{category}</span>
+                                            <span className="font-semibold text-gray-900">${amount.toFixed(2)}</span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div
+                                                className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
+                                                style={{ width: `${percentage}%` }}
+                                            ></div>
+                                        </div>
                                     </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                        <div
-                                            className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
-                                            style={{ width: `${percentage}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
                     </div>
                 </div>
 
@@ -73,23 +75,25 @@ export default function AnalyticsScreen({ expenses, selectedDate, onMonthChange 
                 <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                     <h3 className="font-bold text-gray-800 mb-3">By Member</h3>
                     <div className="space-y-3">
-                        {Object.entries(memberTotals).map(([member, amount]) => {
-                            const percentage = totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0;
-                            return (
-                                <div key={member}>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-gray-700">{member}</span>
-                                        <span className="font-semibold text-gray-900">${amount.toFixed(2)}</span>
+                        {Object.entries(memberTotals)
+                            .sort(([, a], [, b]) => b - a)
+                            .map(([member, amount]) => {
+                                const percentage = totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0;
+                                return (
+                                    <div key={member}>
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <span className="text-gray-700">{member}</span>
+                                            <span className="font-semibold text-gray-900">${amount.toFixed(2)}</span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div
+                                                className="bg-gradient-to-r from-green-500 to-teal-500 h-2 rounded-full transition-all duration-500"
+                                                style={{ width: `${percentage}%` }}
+                                            ></div>
+                                        </div>
                                     </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                        <div
-                                            className="bg-gradient-to-r from-green-500 to-teal-500 h-2 rounded-full transition-all duration-500"
-                                            style={{ width: `${percentage}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
                     </div>
                 </div>
             </div>
