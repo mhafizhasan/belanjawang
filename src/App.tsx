@@ -42,8 +42,18 @@ export default function App() {
   const fetchData = async (date: Date) => {
     try {
       setLoading(true);
-      const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).toISOString();
-      const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString();
+      // Create start date: 1st of month at 00:00:00 local
+      const start = new Date(date.getFullYear(), date.getMonth(), 1);
+      start.setHours(0, 0, 0, 0);
+
+      // Create end date: Last day of month at 23:59:59 local
+      const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      end.setHours(23, 59, 59, 999);
+
+      // Convert to ISO strings for Supabase comparison (which uses UTC)
+      // Since we set local times correctly, the ISO conversion will respect the local timezone shift.
+      const startOfMonth = start.toISOString();
+      const endOfMonth = end.toISOString();
 
       const { data: membersData, error: membersError } = await supabase
         .from('members')

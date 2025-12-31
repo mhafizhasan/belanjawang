@@ -58,8 +58,12 @@ export default function ExpenseModal({ members, selectedDate, expense, onClose, 
                 }
 
                 const expenseDate = new Date(year, month, day);
-                // timezone offset handling simple approach:
-                expenseDateString = expenseDate.toLocaleDateString('en-CA'); // YYYY-MM-DD
+                // timezone offset handling: Use local date parts to construct YYYY-MM-DD
+                // This ensures that if it's Dec 31st locally, we send '2025-12-31' regardless of UTC
+                const yearStr = expenseDate.getFullYear();
+                const monthStr = String(expenseDate.getMonth() + 1).padStart(2, '0');
+                const dayStr = String(expenseDate.getDate()).padStart(2, '0');
+                expenseDateString = `${yearStr}-${monthStr}-${dayStr}`;
             }
 
             onSave({
